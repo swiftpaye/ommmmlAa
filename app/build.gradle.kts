@@ -1,3 +1,5 @@
+import java.util.Base64
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
@@ -28,11 +30,26 @@ android {
       keyAlias = "upload"
       keyPassword = System.getenv("KEY_PASSWORD")
     }
-    create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
+    
+    val base64File = file("${rootDir}/debug.keystore.base64")
+    val debugKeystore = file("${rootDir}/debug.keystore")
+    if (base64File.exists() && !debugKeystore.exists()) {
+      try {
+        val base64Content = base64File.readText().trim()
+        val decodedBytes = Base64.getDecoder().decode(base64Content)
+        debugKeystore.writeBytes(decodedBytes)
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
+
+    if (debugKeystore.exists()) {
+      create("debugConfig") {
+        storeFile = debugKeystore
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+      }
     }
   }
 
@@ -44,7 +61,10 @@ android {
       signingConfig = signingConfigs.getByName("release")
     }
     debug {
-      signingConfig = signingConfigs.getByName("debugConfig")
+      val debugConfig = signingConfigs.findByName("debugConfig")
+      if (debugConfig != null) {
+        signingConfig = debugConfig
+      }
     }
   }
   compileOptions {
