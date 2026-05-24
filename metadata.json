@@ -1,0 +1,6 @@
+{
+  "name": "B2B AI LeadFinder",
+  "description": "منصة احترافية مدعومة بالذكاء الاصطناعي للبحث عن العملاء المحتملين (B2B) والتواصل معهم تلقائياً.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
